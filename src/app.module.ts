@@ -7,10 +7,12 @@ import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
+    TypeOrmModule.forRootAsync(typeOrmConfig),
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
     TasksModule,
     AuthModule,
-    TypeOrmModule.forRoot(typeOrmConfig),
-    ConfigModule.forRoot(),
   ],
 })
 export class AppModule {}
