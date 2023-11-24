@@ -10,10 +10,15 @@ import {
 } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { LoginCredentialsDTO } from './dto/login-credentials.dto';
+import { JwtService } from '@nestjs/jwt';
+import { JwtPayload } from './jwt-payload.interface';
+import { ConfigService } from '@nestjs/config';
 
 export class UsersRepository extends Repository<User> {
   constructor(
     @InjectRepository(User) private usersRepository: Repository<User>,
+    private jwtService: JwtService,
+    private config: ConfigService,
   ) {
     super(
       usersRepository.target,
@@ -44,7 +49,9 @@ export class UsersRepository extends Repository<User> {
     }
   }
 
-  async signIn(loginCredentialsDto: LoginCredentialsDTO): Promise<string> {
+  async signIn(
+    loginCredentialsDto: LoginCredentialsDTO,
+  ): Promise<{ access_token: string }> {
     const { username, password } = loginCredentialsDto;
 
     const user = await this.usersRepository.findOne({ where: { username } });
@@ -54,6 +61,21 @@ export class UsersRepository extends Repository<User> {
 
     delete user.password;
 
-    return 'success';
+    return this.signToken(user.id, username);
+  }
+
+  async signToken(
+    userId: string,
+    username: string,
+  ): Promise<{ access_token: string }> {
+    const payload: JwtPayload = { userId, username };
+    const secret: string = this.config.get('JWT_SECRET');
+
+    const accessToken: string = await this.jwtService.sign(payload, {
+      expiresIn: '15m',
+      secret,
+    });
+
+    return { access_token: accessToken };
   }
 }
