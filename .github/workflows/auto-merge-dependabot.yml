@@ -15,10 +15,8 @@ jobs:
       - name: Merge minor Dependabot PRs
         if: |
           github.event_name == 'pull_request' &&
-          contains(github.event.pull_request.labels.*.name, 'dependencies') &&
-          contains(github.event.pull_request.title, 'Bump') &&
-          github.event.pull_request.base.ref == 'main' &&
-          contains(github.event.pull_request.labels.*.name, 'minor')
+          github.event.pull_request.user.login == 'dependabot[bot]' &&
+          contains(github.event.pull_request.title, 'Bump')
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
