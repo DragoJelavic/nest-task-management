@@ -16,9 +16,8 @@ jobs:
         if: |
           github.event_name == 'pull_request' &&
           github.event.pull_request.user.login == 'dependabot[bot]' &&
-          contains(github.event.pull_request.labels[*].name, 'dependencies') &&
-          contains(github.event.pull_request.labels[*].name, 'minor')
-
+          contains(github.event.pull_request.labels[*].name, 'dependencies') 
+          
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
