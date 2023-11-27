@@ -12,7 +12,7 @@ jobs:
       - name: Inspect Pull Request Data
         if: github.event_name == 'pull_request'
         run: |
-          echo "Pull Request Event:"
+          echo "Pull Request Event now:"
           echo "${{ toJson(github.event.pull_request) }}"
 
   auto_merge:
