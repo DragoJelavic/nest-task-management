@@ -1,0 +1,24 @@
+name: Auto-Merge Dependabot PRs
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  auto_merge:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Merge Dependabot PRs
+        if: ${{ contains(github.event.pull_request.title, 'Bump') }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git fetch origin ${{ github.event.pull_request.head.ref }}
+          git checkout -b merge-branch origin/${{ github.event.pull_request.head.ref }}
+          git merge --no-ff main
+          git push origin merge-branch
+          curl -s -XPOST -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" -H "Content-Type: application/json" -d '{"commit_title": "Merge Dependabot PR","commit_message": "Automatically merged changes from Dependabot"}' https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/merge
