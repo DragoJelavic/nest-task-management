@@ -31,7 +31,6 @@ jobs:
 
       - name: Merge minor Dependabot PRs
         if: |
-          github.event.pull_request.user.login == 'dependabot[bot]' &&
           contains(github.event.pull_request.title, 'Bump')
           
         run: |
