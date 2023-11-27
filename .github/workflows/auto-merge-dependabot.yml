@@ -5,8 +5,20 @@ on:
     types: [opened, synchronize]
 
 jobs:
+  inspect_pr_data:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Inspect Pull Request Data
+        if: github.event_name == 'pull_request'
+        run: |
+          echo "Pull Request Event:"
+          echo "${{ toJson(github.event.pull_request) }}"
+
   auto_merge:
     runs-on: ubuntu-latest
+    needs: inspect_pr_data
+    if: github.event_name == 'pull_request'
 
     steps:
       - name: Checkout code
@@ -19,7 +31,6 @@ jobs:
 
       - name: Merge minor Dependabot PRs
         if: |
-          github.event_name == 'pull_request' &&
           github.event.pull_request.user.login == 'dependabot[bot]' &&
           contains(github.event.pull_request.title, 'Bump')
           
